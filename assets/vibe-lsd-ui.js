@@ -31,7 +31,7 @@ function createTimeline(data) {
     axes: {
       xaxis: {
         renderer: $.jqplot.DateAxisRenderer,
-        tickInterval: '1 week'
+        tickInterval: '1 month'
       },
       yaxis: {
         min: 0,
