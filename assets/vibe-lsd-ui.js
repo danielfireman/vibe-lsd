@@ -1,6 +1,13 @@
-function createTimeline() {
-  var data = [['2008-06-30 8:00AM',4], ['2008-7-14 8:00AM',6.5], ['2008-7-28 8:00AM',5.7], ['2008-8-11 8:00AM',9], ['2008-8-25 8:00AM',8.2]];
-  var plot = $.jqplot('timeline', [data], {
+function createTimeline(data) {
+  var csv = $.csv.toArrays(data, {
+    onParseValue: $.csv.hooks.castToScalar
+  });
+
+  var parsed = csv.map(function(row) {
+    return [new Date(row[0]).toUTCString(), row[1]];
+  });
+
+  var plot = $.jqplot('timeline', [parsed], {
     gridPadding: {
       right: 35
     },
@@ -14,7 +21,7 @@ function createTimeline() {
     axes: {
       xaxis: {
         renderer: $.jqplot.DateAxisRenderer,
-        tickInterval: '2 weeks'
+        tickInterval: '1 week'
       },
       yaxis: {
         min: 0,
@@ -24,6 +31,20 @@ function createTimeline() {
   });
 }
 
+function readFile(file) {
+      var rawFile = new XMLHttpRequest();
+      rawFile.open("GET", file, false);
+      rawFile.onreadystatechange = function () {
+        if (rawFile.readyState === 4) {
+          if(rawFile.status === 200 || rawFile.status == 0) {
+            var allText = rawFile.responseText;
+            createTimeline(allText);
+          }
+        }
+     }
+     rawFile.send(null);
+}
+
 $(document).ready(function() {
-  createTimeline();
+  readFile('./commits.csv');
 });
