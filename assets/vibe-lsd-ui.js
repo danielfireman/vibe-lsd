@@ -1,13 +1,23 @@
+var plot;
+
 function createTimeline(data) {
+  const DATE_INDEX = 0;
+  const COUNT_INDEX = 1;
+
   var csv = $.csv.toArrays(data, {
     onParseValue: $.csv.hooks.castToScalar
   });
 
   var parsed = csv.map(function(row) {
-    return [new Date(row[0]).toUTCString(), row[1]];
+    var dateInMilis = row[DATE_INDEX] * 1000;
+    return [new Date(dateInMilis).toUTCString(), row[COUNT_INDEX]];
   });
 
-  var plot = $.jqplot('timeline', [parsed], {
+  if (plot) {
+    plot.destroy();
+  }
+
+  plot = $.jqplot('timeline', [parsed], {
     gridPadding: {
       right: 35
     },
@@ -46,5 +56,12 @@ function readFile(file) {
 }
 
 $(document).ready(function() {
-  readFile('./commits.csv');
+  $('#metric')
+    .change(function() {
+      $('select option:selected').each(function() {
+          var metricFile = $(this).text().toLowerCase() + '.csv';
+          readFile(metricFile);
+      });
+    })
+    .trigger('change');
 });
